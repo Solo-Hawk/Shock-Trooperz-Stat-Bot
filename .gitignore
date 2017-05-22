@@ -1,0 +1,3 @@
+resources/apikey.txt
+resources/token.txt
+*.pyc
