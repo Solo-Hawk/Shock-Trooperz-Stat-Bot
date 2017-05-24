@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 # 3rd Party Modules
 import discord
-from stat import stat
+import resources.stat as stat
 
 discord_client = discord.Client()
 
@@ -59,19 +59,32 @@ async def on_member_join(member):
 @discord_client.event
 async def on_message(message):
     if message.content.startswith(prefix + 'stats'):
-        userSend = message.content.split(" ")
-        name = userSend[1]
+        userIn = message.content.split(" ")
+
+        name = userIn[1]
         try:
-            sample = userSend[2]
+            sampleSizeStart = message.content.split(" ")[3]
+            sampleSize = message.content.split(" ")[2]
         except IndexError:
-            sample = 1000
+            try:
+                sampleSize = message.content.split(" ")[2]
+                sampleSizeStart = '0';
+            except IndexError:
+                sampleSize = '1000'
+                sampleSizeStart = '0';
         try:
-            response = stat.stats(discord_client, name, sample)
+            response = stat.stats(discord_client, name, sampleSizeStart, sampleSize)
             await discord_client.send_message(message.channel, response)
 
         except:
             await discord_client.send_message(message.channel, "Error getting stats")
             raise
+
+
+
+
+
+
 
     elif message.content.startswith('!help'):
         await discord_client.send_message(message.channel,
