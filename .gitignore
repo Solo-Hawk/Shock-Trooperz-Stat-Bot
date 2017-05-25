@@ -1,3 +1,5 @@
 resources/apikey.txt
 resources/token.txt
 *.pyc
+*.xml
+.idea/Shock-Trooperz-Stat-Bot.iml
