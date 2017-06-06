@@ -15,30 +15,27 @@ apikey = get_apikey("resources/apikey.txt")
 
 
 def stats(discord_client, playername, samplesizestart, samplesize):
-    response = "```" + '\n'
-    metaRes, playerID = censusapi.get_meta(apikey, playername)
-    response = response + metaRes
-    killRes, data, kills, hsr = response + censusapi.get_kills(apikey, playerID, samplesizestart, samplesize, False)
-    response = response + killRes
-    iviRes = censusapi.grab_weapons_data(apikey, id, data, kills, hsr)
+    response = "```"
 
 
 
-    response = response + '```'
-
+    response = response + "```"
     return response
+
+
 def statm(discord_client, playername, samplesizestart, samplesize):
-    response = "```" + '\n'
-    metaRes, playerID = censusapi.get_meta(apikey, playername)
-    response = response + metaRes
+    response = "```"
 
+    # code here
 
+    response = response + "```"
+    return response
 
-    response = response + '```'
 
 def statl(discord_client, playername, samplesizestart, samplesize):
-    response = "```" + '\n'
-    response = response + censusapi.get_meta(apikey, playername)
+    response = "```"
 
-    response = response + '```'
+    # code here
 
+    response = response + "```"
+    return response
