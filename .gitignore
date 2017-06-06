@@ -1,6 +1,10 @@
 resources/apikey.txt
 resources/token.txt
+
 resources/presetGuides.txt
 *.pyc
 resources/censusapi - Redundant.py
 .idea\
+*.pyc
+*.xml
+.idea/Shock-Trooperz-Stat-Bot.iml
