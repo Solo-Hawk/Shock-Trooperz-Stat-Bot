@@ -8,3 +8,4 @@ resources/censusapi - Redundant.py
 *.pyc
 *.xml
 .idea/Shock-Trooperz-Stat-Bot.iml
+resources/URL Template Files
