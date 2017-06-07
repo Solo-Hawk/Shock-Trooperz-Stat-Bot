@@ -1,4 +1,3 @@
-from bot import *
 import requests
 import json
 import threading
@@ -10,10 +9,11 @@ def get_json(html):
     data = json.loads(text)
     return data
 
-def get_character(apikey, name): # return list object formated in (character_id, name, faction, battle_rank, next_battle_rank)
+
+def get_character(apikey, name):  # grabs basic data of the user through their name in lowercase form, returns none if no player info was found/
     result = None
     try:
-        data = get_json("http://census.daybreakgames.com/s:" + apikey + "/json/get/ps2:v2/character/?name.first_lower=" + name.lower)
+        data = get_json("http://census.daybreakgames.com/s:" + apikey + "/json/get/ps2:v2/character/?name.first_lower=" + name.lower())
         character_id = str(data['character_list'][0]['character_id'])
         name = str(data['character_list'][0]['name']['first'])
         faction = str(get_faction(data['character_list'][0]['faction_id']))
@@ -23,7 +23,7 @@ def get_character(apikey, name): # return list object formated in (character_id,
     except Exception as e:
         raise e
 
-    return result
+    return result  # return list object formatted in (character_id, name, faction, battle_rank, next_battle_rank)
 
 
 def get_faction(faction_id):
@@ -37,8 +37,9 @@ def get_faction(faction_id):
         faction = 'none'
     return faction
 
-def validate_bushido(ID):
-    text_file = open("filter.txt", "r")
+
+def validate_bushido(ID):  # checks weapon against bushido filter list (courtesy of Joke Stat Tracker)
+    text_file = open("resources/filter.txt", "r")
     data = text_file.read()
 
     for weapon in str(data).split('\n'):
@@ -46,33 +47,62 @@ def validate_bushido(ID):
             return False
     return True
 
-def get_events(apikey, character_id, samplestart, samplesize):
-    weapons = []
+
+def get_events(apikey, character_id, samplestart, samplesize):  # gets the KDR and HSR including weapons the target player has used and the kills from the events of that gun
+    topweapons = []
+    classweapons = []
     kills = 0
     deaths = 0
     events = 0
     headshots = 0
     sampleSearch = samplestart + samplesize
-    data = get_json("https://census.daybreakgames.com/s:"+apikey+"/get/ps2:v2/characters_event/?character_id="+character_id+"type=KILL,DEATH&c:limit=" + sampleSearch)
+    data = get_json("https://census.daybreakgames.com/s:"+apikey+"/get/ps2:v2/characters_event/?character_id=" + character_id + "&type=KILL,DEATH&c:limit=" + sampleSearch)
     for i in range(int(samplestart), int(samplesize)):
+        check = True
         try:
-            if data['characters_event_list'][i]['table_type'] == 'kills' and \
+            if data['characters_event_list'][i]['table_type'] == 'kills' and\
+            data['characters_event_list'][i]['attacker_character_id'] == character_id and \
             not validate_bushido(data['characters_event_list'][i]['attacker_weapon_id'] and
             data['characters_event_list'][i]['attacker_vehicle_id'] == '0'):
+
                 headshots += int(data['characters_event_list'][i]['is_headshot'])
                 kills += 1
-                weapons.append(data['characters_event_list'][i]['attacker_weapon_id'])
+                for j in range(len(classweapons)):
+                    if data['characters_event_list'][i]['attacker_loadout_id'] == classweapons[j][0]:
+                        check = False
+                        classweapons[j][2] = classweapons[j][2] + 1
+                if check:
+                    classweapons.append([data['characters_event_list'][i]['attacker_loadout_id'], data['characters_event_list'][i]['attacker_weapon_id'], 0])
+
             else:
                 deaths += 1
             events += 1
         except IndexError:
             break
-        result = [kills, deaths, headshots, events, weapons]
-    return result
+    for i in classweapons:
+        if i[2] > 100:
+            print(i[2])
+            topweapons.append(i)
 
-def get_accuracy(weapons, profiles):
+
+    result = [kills, deaths, headshots, events, classweapons, topweapons]
+    return result  # return list object formatted in (kills, deaths, headshots, events, classweapons, topweapons)
+
+def get_accuracy(apikey, character_id, weapons):
+    profiles = " "
+    for i in range(len(weapons)):
+        try:
+            if profiles.index(weapons[i][0]) == -1:
+                temp = None
+        except ValueError:
+            profiles = profiles + weapons[i][0] + ","
     data = get_json(
-        "https://census.daybreakgames.com/s:558296/get/ps2:v2/characters_stat?character_id=5428257774265773585&stat_name=fire_count,hit_count&profile_id="+profiles+"&c:limit=50")
+        "https://census.daybreakgames.com/s:"+apikey+"/get/ps2:v2/characters_stat?character_id="+character_id+"&stat_name=fire_count,hit_count&profile_id="+profiles+"&c:limit=50")
+    print("https://census.daybreakgames.com/s:"+apikey+"/get/ps2:v2/characters_stat?character_id="+character_id+"&stat_name=fire_count,hit_count&profile_id="+profiles+"&c:limit=50")
+    print(data)
+    print(profiles)
+    print(profiles)
+    print(profiles)
 
 if __name__ == "__main__":
     print("Commands involving getting the JSON files from Census and Fisu APIs, also make for styling the text for the"

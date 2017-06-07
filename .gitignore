@@ -2,10 +2,11 @@ resources/apikey.txt
 resources/token.txt
 
 resources/presetGuides.txt
+resources/URL Template Files
 *.pyc
 resources/censusapi - Redundant.py
 .idea\
 *.pyc
 *.xml
 .idea/Shock-Trooperz-Stat-Bot.iml
-resources/URL Template Files
+

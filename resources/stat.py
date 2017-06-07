@@ -15,11 +15,18 @@ apikey = get_apikey("resources/apikey.txt")
 
 
 def stats(discord_client, playername, samplesizestart, samplesize):
+
     response = "```"
-
-
-
-    response = response + "```"
+    character_result = censusapi.get_character(apikey, playername)
+    event_result = censusapi.get_events(apikey, character_result[0],samplesizestart,samplesize)
+    accuracy_result = censusapi.get_accuracy(apikey, character_result[0], event_result[4])
+    print(character_result)
+    print(event_result)
+    print(character_result)
+    print(event_result)
+    print(character_result)
+    print(event_result)
+    response =  response +  "```"
     return response
 
 
