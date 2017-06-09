@@ -88,8 +88,20 @@ def get_events(apikey, character_id, samplestart, samplesize):  # gets the KDR a
     result = [kills, deaths, headshots, events, classweapons, topweapons]
     return result  # return list object formatted in (kills, deaths, headshots, events, classweapons, topweapons)
 
-def get_accuracy(apikey, character_id, weapons):
+def get_accuracy(apikey, character_id, weapons, samplesize):
     profiles = " "
+    dailyfire = 0
+    dailyhit = 0
+    dailyacc = 0
+    weeklyfire = 0
+    weeklyhit = 0
+    weeklyacc = 0
+    monthlyfire = 0
+    monthlyhit = 0
+    monthlyacc = 0
+    lifefire = 0
+    lifehit = 0
+    lifeacc = 0
     for i in range(len(weapons)):
         try:
             if profiles.index(weapons[i][0]) == -1:
@@ -99,10 +111,31 @@ def get_accuracy(apikey, character_id, weapons):
     data = get_json(
         "https://census.daybreakgames.com/s:"+apikey+"/get/ps2:v2/characters_stat?character_id="+character_id+"&stat_name=fire_count,hit_count&profile_id="+profiles+"&c:limit=50")
     print("https://census.daybreakgames.com/s:"+apikey+"/get/ps2:v2/characters_stat?character_id="+character_id+"&stat_name=fire_count,hit_count&profile_id="+profiles+"&c:limit=50")
-    print(data)
-    print(profiles)
-    print(profiles)
-    print(profiles)
+    for i in range(len(data['characters_stat_list'])):
+        if data['characters_stat_list'][i]['stat_name'] == "fire_count":
+            dailyfire = dailyfire + int(data['characters_stat_list'][i]['value_daily'])
+            weeklyfire = weeklyfire + int(data['characters_stat_list'][i]['value_weekly'])
+            monthlyfire = monthlyfire + int(data['characters_stat_list'][i]['value_monthly'])
+            lifefire = lifefire + int(data['characters_stat_list'][i]['value_forever'])
+        if data['characters_stat_list'][i]['stat_name'] == "hit_count":
+            dailyhit = dailyhit + int(data['characters_stat_list'][i]['value_daily'])
+            weeklyhit = weeklyhit + int(data['characters_stat_list'][i]['value_weekly'])
+            monthlyhit = monthlyhit + int(data['characters_stat_list'][i]['value_monthly'])
+            lifehit = lifehit + int(data['characters_stat_list'][i]['value_forever'])
+    dailyacc = dailyhit / dailyfire
+    weeklyacc = weeklyhit / weeklyfire
+    monthlyacc = monthlyhit / monthlyfire
+    lifeacc = lifehit / lifefire
+    if dailyfire >= int(samplesize):
+        return ['Daily', dailyacc]
+    if weeklyfire >= int(samplesize):
+        return ['Weekly', weeklyacc]
+    if monthlyfire >= int(samplesize):
+        return ['Monthly', monthlyacc]
+    if lifefire >= int(samplesize):
+        return ['Lifetime', lifeacc]
+    return None
+
 
 if __name__ == "__main__":
     print("Commands involving getting the JSON files from Census and Fisu APIs, also make for styling the text for the"
