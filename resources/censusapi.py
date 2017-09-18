@@ -136,6 +136,11 @@ def get_accuracy(apikey, character_id, weapons, samplesize):
         return ['Lifetime', lifeacc]
     return None
 
+def get_wep(apikey, id, weapon):
+    print(weapon)
+    data = get_json("http://census.daybreakgames.com/s:" + apikey + "/get/ps2:v2/characters_weapon_stat?character_id=" + id + "&item_id=" + weapon + "&c:limit=50&c:lang=en&c:resolve=item&c:sort=value:-1")
+    return data['characters_weapon_stat_list'][0]['item']['name']['en']
+
 
 if __name__ == "__main__":
     print("Commands involving getting the JSON files from Census and Fisu APIs, also make for styling the text for the"
